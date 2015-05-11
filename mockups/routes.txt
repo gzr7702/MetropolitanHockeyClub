@@ -1,0 +1,23 @@
+Show all teams:
+	/teams (and '/')
+
+Create a new team:
+	/team/new
+
+Edit a team:
+	/teams/<int:team_id>/edit
+
+Delete a team:
+	/teams/<int:team_id>/delete
+
+Show a roster:
+	/team/<int:team_id>/roster (and /team/<int:team_id>/)
+
+Add a new player:
+	/team/<int:team_id>/roster/new 
+
+Edit a player:
+	/team/<int:team_id>/roster/<int:player_id>/edit
+
+Delete a player:
+	/team/<int:team_id>/roster/<int:player_id>/delete
