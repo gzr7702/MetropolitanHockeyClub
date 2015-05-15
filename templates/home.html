@@ -1,0 +1,42 @@
+<html>
+<head>
+	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+	<div class = 'pane'>
+		<div class = 'header'>
+		<h1>Metropolitan Hockey Club</h1>
+	</div>
+
+	<!--
+	<div class = 'flash'>
+		{% with messages = get_flashed_messages() %}
+			{% if messages %}
+				<ul>
+				{% for message in messages %}
+					<li><strong>{{ message }}</strong></li>
+				{% endfor %}
+				</ul>
+			{% endif %}
+		{% endwith %}
+	</div>
+	-->
+
+	<a href="{{ url_for('newTeam') }}">Add a new team</a>
+
+	{% for team in teams %}
+		<div>
+			<p><a href="{{ url_for('showRoster', team_id=team.id) }}">{{team.name}}</a></p>
+			<br>
+		</div>
+	{% else %}
+		<div>
+			<h2>There don't seem to be any teams added</h2>
+			<a href="{{ url_for('newTeam') }}">Click here to add a new team</a>
+			<br>
+		</div>
+	{% endfor %}
+</body>
+
+</html>

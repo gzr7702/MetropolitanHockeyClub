@@ -1,8 +1,8 @@
 Show all teams:
-	/teams (and '/')
+	/home (and '/')
 
 Create a new team:
-	/team/new
+	/teams/new
 
 Edit a team:
 	/teams/<int:team_id>/edit
