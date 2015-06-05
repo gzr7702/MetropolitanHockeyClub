@@ -13,6 +13,10 @@ class Team(Base):
 	name = Column(String(250), nullable=False)
 	owner = Column(String(250), nullable=False)
 
+	def __init__(self, name, owner):
+		self.name = name
+		self.owner = owner
+
 class Player(Base):
 	__tablename__ = 'player'
 
@@ -22,6 +26,11 @@ class Player(Base):
 	points = Column(Integer)
 	team_id = Column(Integer,ForeignKey('team.id'))
 	team = relationship(Team) 
+
+	def __init__(self, name, position, points):
+		self.name = name
+		self.position = position
+		self.points = points
 
 	@property
 	def serialize(self):

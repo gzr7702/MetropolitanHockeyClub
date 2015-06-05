@@ -17,14 +17,14 @@ def showTeams():
 	teams = session.query(Team).all()
 	return render_template('home.html', teams=teams)
 
-@app.route('/teams/new/')
+@app.route('/teams/new/', methods=['GET', 'POST'])
 def newTeam():
 	""" Add a new team """
 	if request.method == 'POST':
-		new_team = Team(name = request.form['name'], team_id = team_id)
-		owner = Team(name = request.form['owner'], team_id = team_id)
+		name = request.form['name']
+		owner = request.form['owner']
+		new_team = Team(name, owner)
 		session.add(new_team)
-		session.add(owner)
 		session.commit()
 		flash("New team created!")
 		return redirect(url_for('showTeams'))
@@ -34,7 +34,18 @@ def newTeam():
 @app.route('/teams/<int:team_id>/edit/')
 def editTeam(team_id):
 	""" This page will allow someone to edit a full team at one time."""
-	return render_template('editteam.html', team=team, players=players)
+	editedItem = session.query(Team).filter_by(id = team_id).one()
+	if request.method == 'POST':
+		if request.form['name']:
+			editedItem.name = request.form['name']
+		session.add(editedItem)
+		session.commit()
+		flash("Team edited!")
+		return redirect(url_for('restaurantMenu', restaurant_id = restaurant_id))
+	else:
+		team = session.query(Team).filter_by(id = team_id).one()
+		players = session.query(Player).filter_by(team_id = team.id)
+		return render_template('editteam.html', team=team_id, players=players)
 
 @app.route('/teams/<int:team_id>/delete/')
 def deleteTeam(team_id):
@@ -64,6 +75,6 @@ def deletePlayer(team_id, player_id):
 	return render_template('deleteplayer.html', player=player, team=team)
 
 if __name__ == '__main__':
-	#app.secret_key = 'super_secret_key'
+	app.secret_key = 'super_secret_key'
 	app.debug = True
 	app.run(host = '0.0.0.0', port=5000)
