@@ -7,14 +7,15 @@
 	<h1>Add a New Player</h1>
 
 	<div class = 'pane'>
+			<form action="{{ url_for('addPlayer', team_id=team_id) }}" method = 'POST'>
 
 			<dl>
 				<dt>Name:</dt>
 					<dd><input type ='text' size='30' name='name'></dd>
 				<dt>Position:</dt>
-					<dd><input type ='text' size='30' name='name'></dd>
+					<dd><input type ='text' size='30' name='position'></dd>
 				<dt>Points:</dt>
-					<dd><input type ='text' size='30' name='name'></dd>
+					<dd><input type ='text' size='30' name='points'></dd>
 			</dl>
 
 

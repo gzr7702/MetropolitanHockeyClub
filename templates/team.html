@@ -24,16 +24,21 @@
 	-->
 	<a href="{{ url_for('addPlayer', team_id=team.id)}}">Add a new player</a>
 
-	{% for player in players %}
-	<div>
-		<p>Name: {{player.name}}</p>
-		<p>Position: {{player.position}}</p>
-		<p>Total Points: {{player.points}}</p>
-		<p><a href="{{ url_for('editPlayer', team_id=team.id, player_id=player.id)}}">edit</a></p>
-		<p><a href="{{ url_for('deletePlayer', team_id=team.id, player_id=player.id)}}">delete</a></p>
-		<br>
-	</div>
-	{% endfor %}
+	{% if not players %}
+		<p>Sorry, there are no players on this team. Please <a href="{{ url_for('addPlayer', team_id=team.id)}}">add some.</a>
+</p>
+	{% else %}
+		{% for player in players %}
+		<div>
+			<p>Name: {{player.name}}</p>
+			<p>Position: {{player.position}}</p>
+			<p>Total Points: {{player.points}}</p>
+			<p><a href="{{ url_for('editPlayer', team_id=team.id, player_id=player.id)}}">edit</a></p>
+			<p><a href="{{ url_for('deletePlayer', team_id=team.id, player_id=player.id)}}">delete</a></p>
+			<br>
+		</div>
+		{% endfor %}
+	{% endif %}
 
 
 </body>
