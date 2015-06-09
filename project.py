@@ -10,6 +10,25 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
+# Need to add functionality to api for players/teams that are not found!
+# Here is our JSON api:
+@app.route('/teams/JSON/')
+def teamsJSON():
+	teams = session.query(Team).all()
+	return jsonify(Teams=[t.serialize for t in teams])
+
+@app.route('/teams/<int:team_id>/roster/JSON/')
+def teamRosterJSON(team_id):
+	team = session.query(Team).filter_by(id = team_id).one()
+	players = session.query(Player).filter_by(team_id = team.id)
+	return jsonify(Players=[p.serialize for p in players])
+
+@app.route('/player/<int:player_id>/JSON/')
+def playerJSON(player_id):
+	player = session.query(Player).filter_by(id = player_id).one()
+	return jsonify(player.serialize)
+
+# Here are our pages:
 @app.route('/')
 @app.route('/home/')
 def showTeams():

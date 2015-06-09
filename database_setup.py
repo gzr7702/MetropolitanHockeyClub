@@ -17,6 +17,15 @@ class Team(Base):
 		self.name = name
 		self.owner = owner
 
+	@property
+	def serialize(self):
+	    return {
+	    	'name': self.name,
+	    	'owner': self.owner,
+	    	'id': self.id,
+	    	}
+
+
 class Player(Base):
 	__tablename__ = 'player'
 
@@ -40,7 +49,7 @@ class Player(Base):
 	    	'position': self.position,
 	    	'id': self.id,
 	    	'points': self.points,
-	    	'penalty_minutes': self.penalty_minutes,
+	    	'team_id': self.team_id,
 	    	}
 
 
