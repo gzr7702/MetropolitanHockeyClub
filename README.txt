@@ -1,0 +1,1 @@
+This is an application that can be used to track the teams and players of a local hockey team.

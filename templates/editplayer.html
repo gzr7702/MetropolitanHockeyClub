@@ -3,18 +3,17 @@
 	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}">
 	</head>
 <body>
-
-	<h1>Add a New Player</h1>
+	<h1><a href='/home/'>Metropolitan Hockey Club</a></h1>
+	<h2>Edit Info for {{ player.name }}</h2>
 
 	<div class = 'pane'>
+			<form action="{{ url_for('editPlayer', team_id=player.team_id, player_id=player.id) }}" method = 'POST'>
 
 			<dl>
-				<dt>Name:</dt> {{player.name}}
-					<dd><input type ='text' size='30' name='name'></dd>
-				<dt>Position:</dt>
-					<dd><input type ='text' size='30' name='name'></dd>
-				<dt>Points:</dt>
-					<dd><input type ='text' size='30' name='name'></dd>
+				<dt>Position:</dt><dt>Current Postition: {{ player.position }}</dt>
+					<dd><input type ='text' size='30' name='position'></dd>
+				<dt>Points:</dt><dt>Current Points: {{ player.points }}</dt>
+					<dd><input type ='text' size='30' name='points'></dd>
 			</dl>
 
 

@@ -59,11 +59,10 @@ def addPlayer(team_id):
 		name = request.form['name']
 		position = request.form['position']
 		points = request.form['points']
-		#if name exists, throw an error
+		#if name already exists, return to form
 		if session.query(Player).filter_by(name = name).count() > 0:
+			# Is a flash enough to alert the user? ==================
 			flash(name + " already exists!")
-			# Is a flash enough to alert the user?
-			print(name + " already exists!")
 			return render_template('newplayer.html', team_id=team_id)
 		new_player = Player(name, position, points, team_id)
 		session.add(new_player)
@@ -73,21 +72,53 @@ def addPlayer(team_id):
 	else:
 		return render_template('newplayer.html', team_id=team_id)
 
-@app.route('/team/<int:team_id>/roster/<int:player_id>/edit/')
+@app.route('/team/<int:team_id>/roster/<int:player_id>/edit/', methods=['GET', 'POST'])
 def editPlayer(team_id, player_id):
-	return render_template('editplayer.html', player=player, team=team)
+	""" Edit the position or points of a particular player """
+	player = session.query(Player).filter_by(id = player_id).one()
+	if request.method == 'POST':
+		position = request.form['position']
+		points = request.form['points']
+		if position != player.position:
+			player.position = position
+		if points != player.points:
+			player.points = points
+		session.commit()
+		return redirect(url_for('showRoster', team_id=team_id))
+	else:
+		return render_template('editplayer.html', player=player)
 
-@app.route('/team/<int:team_id>/roster/<int:player_id>/delete/')
+@app.route('/team/<int:team_id>/roster/<int:player_id>/delete/', methods=['GET', 'POST'])
 def deletePlayer(team_id, player_id):
-	if request.method == "POST":
-		print "Postin', yo!"
-	return render_template('deleteplayer.html', player=player, team=team)
+	""" Delete Team and disassociate all its players from the team."""
+	player = session.query(Player).filter_by(id = player_id).one()
+	if request.method == 'POST':
+		session.delete(player)
+		session.commit()
+		flash("Player " + player.name + " deleted!")
+		return redirect(url_for('showRoster', team_id=team_id))
+	else:
+		return render_template('deleteplayer.html', player=player, team_id=team_id)
 
 @app.route('/teams/freeagents/')
 def showFreeAgents():
 	""" Show a list of Players and allow them to be added to a team. """
+	# This is broken until we add user IDs. Need to add player to the user's team ===============
+	# for now, we set team id to 1 just to redirect somewhere
+	team_id = 3
 	players = session.query(Player).filter_by(team_id = 'null')
-	return render_template('freeagents.html', players=players)
+	return render_template('freeagents.html', players=players, team_id=team_id)
+
+@app.route('/team/<int:team_id>/addplayer/<int:player_id>/', methods=['GET', 'POST'])
+def addPlayerToTeam(team_id, player_id):
+	""" Add player to current user's team """
+	player = session.query(Player).filter_by(id = player_id).one()
+	if request.method == 'POST':
+		player.team_id = team_id
+		session.commit()
+		return redirect(url_for('showRoster', team_id=team_id))
+	else:
+		return render_template('addplayer.html', player=player, team_id=team_id)
 
 if __name__ == '__main__':
 	app.secret_key = 'super_secret_key'

@@ -4,10 +4,10 @@
 </head>
 <body>
 	<h1><a href='/home/'>Metropolitan Hockey Club</a></h1>
-	<h2>Are you sure you want to delete {{player.name}}?</h2>
+	<h2>Are you sure you want to add player {{player.name}} to your team?</h2>
 
-	<form action="{{ url_for('deletePlayer',team_id=team_id, player_id=player.id) }}" method='POST'>
-		<input type='submit', value = 'Delete'>
+	<form action="{{ url_for('addPlayerToTeam',team_id=team_id, player_id=player.id) }}" method='POST'>
+		<input type='submit', value = 'Add'>
 	</form>
 
 	<a href = "{{ url_for('showRoster', team_id = team_id) }}"> Cancel </a>
