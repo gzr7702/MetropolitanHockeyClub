@@ -1,9 +1,6 @@
-<html>
-<head>
-	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}"	>
-</head>
-<body>
-	<h1><a href='/home/'>Metropolitan Hockey Club</a></h1>
+{% extends "base.html" %}    
+
+    {% block content %}   
 	<h2>Are you sure you want to delete {{team.name}}?</h2>
 
 	<form action="{{ url_for('deleteTeam',team_id=team_id)}}" method='POST'>
@@ -11,6 +8,4 @@
 	</form>
 
 	<a href = "{{ url_for('showTeams') }}"> Cancel </a>
-</body>
-
-</html>
+{% endblock %}

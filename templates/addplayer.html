@@ -1,16 +1,12 @@
-<html>
-<head>
-	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}"	>
-</head>
-<body>
-	<h1><a href='/home/'>Metropolitan Hockey Club</a></h1>
-	<h2>Are you sure you want to add player {{player.name}} to your team?</h2>
+{% extends "base.html" %}    
 
-	<form action="{{ url_for('addPlayerToTeam',team_id=team_id, player_id=player.id) }}" method='POST'>
-		<input type='submit', value = 'Add'>
-	</form>
+    {% block content %}    
+		<h2>Are you sure you want to add player {{player.name}} to your team?</h2>
 
-	<a href = "{{ url_for('showRoster', team_id = team_id) }}"> Cancel </a>
-</body>
+		<form action="{{ url_for('addPlayerToTeam',team_id=team_id, player_id=player.id) }}" method='POST'>
+			<input type='submit', value = 'Add'>
+		</form>
 
-</html>
+		<a href = "{{ url_for('showRoster', team_id = team_id) }}"> Cancel </a>
+
+    {% endblock %}
