@@ -144,6 +144,11 @@ def addPlayerToTeam(team_id, player_id):
 	else:
 		return render_template('addplayer.html', player=player, team_id=team_id)
 
+@app.route('/about/')
+def about():
+	""" The information page""" 
+	return render_template('about.html')
+
 if __name__ == '__main__':
 	app.secret_key = 'super_secret_key'
 	app.debug = True

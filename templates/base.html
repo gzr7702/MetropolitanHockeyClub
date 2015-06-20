@@ -45,7 +45,7 @@
                     <a href="{{ url_for('showFreeAgents') }}">List of Free Agents</a>
                 </li>
                 <li>
-                    <a href="#">About</a>
+                    <a href="/about/">About</a>
                 </li>
             </ul>
         </div>
@@ -55,9 +55,23 @@
         <div id="page-content-wrapper">
             <div class="container-fluid">
 
-               {% block content %}{% endblock %}
+               <div class="container">
+               {% block content %}
+               {% endblock %}
+               </div>
 
+                <div class="row">
+                    <div class="col-md-12">
+                        <hr>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
                         <a href="#menu-toggle" class="btn btn-default" id="menu-toggle">Toggle Menu</a>
+                    </div>
+                </div>
+
             </div>
         </div>
         <!-- /#page-content-wrapper -->

@@ -1,7 +1,10 @@
 {% extends "base.html" %}    
 
     {% block content %}   
-		<h2>{{team.name}}</h2>
+    <div class="row">
+	    <div class="col-md-12 text-center">
+			<h1>{{team.name}}</h1>
+		</div>
 	</div>
 
 	<!--
@@ -17,20 +20,31 @@
 		{% endwith %}
 	</div>
 	-->
-	<a href="{{ url_for('addPlayer', team_id=team.id)}}">Add a new player</a>
+
+    <div class="row">
+	    <div class="col-md-12">
+			<a href="{{ url_for('addPlayer', team_id=team.id)}}">Add a new player</a>
+		</div>
+	</div>
 
 	{% if not players %}
-		<p>Sorry, there are no players on this team. Please <a href="{{ url_for('addPlayer', team_id=team.id)}}">add some.</a>
-</p>
+	    <div class="row">
+	    	<div class="col-md-12">
+				<p>Sorry, there are no players on this team_id. 
+				Please <a href="{{ url_for('addPlayer', team_id=team.id)}}">add some.</a></p>
+			</div>
+		</div>
 	{% else %}
 		{% for player in players %}
-		<div>
-			<p>Name: {{player.name}}</p>
-			<p>Position: {{player.position}}</p>
-			<p>Total Points: {{player.points}}</p>
-			<p><a href="{{ url_for('editPlayer', team_id=team.id, player_id=player.id)}}">edit</a></p>
-			<p><a href="{{ url_for('deletePlayer', team_id=team.id, player_id=player.id)}}">delete</a></p>
-			<br>
+	    <div class="row">
+		    <div class="col-md-12">
+				<h3>Name: {{player.name}}</h3>
+				<h3>Position: {{player.position}}</h3>
+				<h3>Total Points: {{player.points}}</h3>
+				<p><a href="{{ url_for('editPlayer', team_id=team.id, player_id=player.id)}}">edit</a></p>
+				<p><a href="{{ url_for('deletePlayer', team_id=team.id, player_id=player.id)}}">delete</a></p>
+				<br>
+			</div>
 		</div>
 		{% endfor %}
 	{% endif %}
