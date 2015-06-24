@@ -13,8 +13,23 @@ session = DBSession()
 # Here is our JSON api:
 @app.route('/teams/JSON/')
 def teamsJSON():
+	""" Return JSON of all teams in the league"""
 	teams = session.query(Team).all()
 	return jsonify(Teams=[t.serialize for t in teams])
+
+@app.route('/teams/<int:team_id>/JSON/')
+@app.route('/teams/<int:team_id>/roster/JSON/')
+def rosterJSON(team_id):
+	""" Return JSON of all players in a team """
+	team = session.query(Team).filter_by(id = team_id).one()
+	players = session.query(Player).filter_by(team_id = team.id)
+	return jsonify(Players=[p.serialize for p in players])
+
+@app.route('/teams/freeagents/JSON/')
+def freeAgentsJSON():
+	""" Return JSON of Players that are not associated with a team. """
+	players = session.query(Player).filter_by(team_id = 'null')
+	return jsonify(Players=[p.serialize for p in players])
 
 # Need to add functionality to api for players/teams that are not found! ==============================
 
