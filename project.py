@@ -10,20 +10,16 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
-# Here is our JSON api:
+# Need to add functionality to api for players/teams that are not found! ==============================
+# --------------------------------------------------------------------
+# Here is our JSON api 
+# Includes: team, free agents, team rosters, individual players
+# --------------------------------------------------------------------
 @app.route('/teams/JSON/')
 def teamsJSON():
 	""" Return JSON of all teams in the league"""
 	teams = session.query(Team).all()
 	return jsonify(Teams=[t.serialize for t in teams])
-
-@app.route('/teams/<int:team_id>/JSON/')
-@app.route('/teams/<int:team_id>/roster/JSON/')
-def rosterJSON(team_id):
-	""" Return JSON of all players in a team """
-	team = session.query(Team).filter_by(id = team_id).one()
-	players = session.query(Player).filter_by(team_id = team.id)
-	return jsonify(Players=[p.serialize for p in players])
 
 @app.route('/teams/freeagents/JSON/')
 def freeAgentsJSON():
@@ -31,8 +27,7 @@ def freeAgentsJSON():
 	players = session.query(Player).filter_by(team_id = 'null')
 	return jsonify(Players=[p.serialize for p in players])
 
-# Need to add functionality to api for players/teams that are not found! ==============================
-
+@app.route('/teams/<int:team_id>/JSON/')
 @app.route('/teams/<int:team_id>/roster/JSON/')
 def teamRosterJSON(team_id):
 	try:
@@ -48,7 +43,9 @@ def playerJSON(player_id):
 	player = session.query(Player).filter_by(id = player_id).one()
 	return jsonify(player.serialize)
 
-# Here are our pages:
+# --------------------------------------------------------------------
+# Here are our pages 
+# --------------------------------------------------------------------
 @app.route('/')
 @app.route('/home/')
 def showTeams():
