@@ -1,0 +1,34 @@
+{% extends "base.html" %}    
+
+    {% block content %}    
+
+        
+
+            {% for team in teams %}
+
+            <div class="row">
+                <div class="col-lg-4">
+                 </div>
+                    <div class="col-lg-4">
+                        <p><h2><a href="{{ url_for('showRoster', team_id=team.id) }}">{{team.name}}</a></h2></p>
+                        <br>
+                    </div>
+                <div class="col-lg-4">
+                </div>
+            </div>
+
+            {% else %}
+            
+            <div class="row">
+                <div class="col-lg-4">
+                </div>
+                    <div class="col-lg-4">
+                        <h2>There don't seem to be any teams added</h2>
+                        <br>
+                    </div>
+                <div class="col-lg-4">
+                </div>
+            </div>
+            {% endfor %}
+
+    {% endblock %}

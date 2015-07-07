@@ -1,0 +1,50 @@
+{% extends "base.html" %}    
+
+    {% block content %}   
+	<div class="container">
+		<h2>Free Agents</h2>
+
+	<!--
+	<div class = 'flash'>
+		{% with messages = get_flashed_messages() %}
+			{% if messages %}
+				<ul>
+				{% for message in messages %}
+					<li><strong>{{ message }}</strong></li>
+				{% endfor %}
+				</ul>
+			{% endif %}
+		{% endwith %}
+	</div>
+	-->
+	{% if not players %}
+		<p>There are no free agents at this time.</p>
+	{% else %}
+		{% for player in players %}
+		<div class="row">
+			<div class="col-md-4">
+				<h4>Name: {{player.name}}</h4>
+			</div>
+			<div class="col-md-4">
+				<h4>Position: {{player.position}}</h4>
+			</div>
+			<div class="col-md-4">
+				<h4>Total Points: {{player.points}}</h4>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4">
+				<a href="{{ url_for('addPlayerToTeam', team_id=team_id, player_id=player.id)}}">add to my team</a>
+			</div>
+			<div class="col-md-8">
+				<a href="{{ url_for('deletePlayer', team_id=team_id, player_id=player.id)}}">delete</a>
+			</div>
+			<div class="row">
+				<hr>
+			</div>
+		</div>
+		{% endfor %}
+	{% endif %}
+	</div>
+
+{% endblock %}

@@ -1,20 +1,38 @@
-from flask import Flask, url_for, render_template, request, redirect, url_for, flash, jsonify
-app = Flask(__name__)
+from flask import Flask, url_for, render_template, request, redirect, url_for, flash, jsonify, abort
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from database_setup import Team, Base, Player
+from database_setup import Team, Base, Player, User
 
+# imports for oauth2
+from flask import session as login_session
+import random
+import string
+
+from oauth2client.client import flow_from_clientsecrets
+from oauth2client.client import FlowExchangeError
+import httplib2
+import json
+from flask import make_response
+import requests
+
+app = Flask(__name__)
+
+CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
+APPLICATION_ID = "MetropolitanHockeyClub"
+
+# Create database session for sqlalchemy
 engine = create_engine('sqlite:///hockeyteams.db')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
-# Need to add functionality to api for players/teams that are not found! ==============================
 # --------------------------------------------------------------------
 # Here is our JSON api 
 # Includes: team, free agents, team rosters, individual players
 # --------------------------------------------------------------------
+# Need to add functionality to api for players/teams that are not found? ==============================
+
 @app.route('/teams/JSON/')
 def teamsJSON():
 	""" Return JSON of all teams in the league"""
@@ -44,6 +62,163 @@ def playerJSON(player_id):
 	return jsonify(player.serialize)
 
 # --------------------------------------------------------------------
+# Functionality for login
+# --------------------------------------------------------------------
+
+# Create anti-forgery state token
+@app.route('/login/')
+def showLogin():
+    state = ''.join(random.choice(string.ascii_uppercase + string.digits)
+                    for x in xrange(32))
+    login_session['state'] = state
+    # return "The current session state is %s" % login_session['state']
+    return render_template('login.html', STATE=state)
+
+
+@app.route('/gconnect', methods=['POST'])
+def gconnect():
+
+    # Validate state token
+    if request.args.get('state') != login_session['state']:
+        response = make_response(json.dumps('Invalid state parameter.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    # Obtain authorization code
+    code = request.data
+
+    try:
+        # Upgrade the authorization code into a credentials object
+        oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
+        oauth_flow.redirect_uri = 'postmessage'
+        credentials = oauth_flow.step2_exchange(code)
+    except FlowExchangeError:
+        response = make_response(
+            json.dumps('Failed to upgrade the authorization code.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    # Check that the access token is valid.
+    access_token = credentials.access_token
+    url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'
+           % access_token)
+    h = httplib2.Http()
+    result = json.loads(h.request(url, 'GET')[1])
+    # If there was an error in the access token info, abort.
+    if result.get('error') is not None:
+        response = make_response(json.dumps(result.get('error')), 500)
+        response.headers['Content-Type'] = 'application/json'
+
+    # Verify that the access token is used for the intended user.
+    gplus_id = credentials.id_token['sub']
+    if result['user_id'] != gplus_id:
+        response = make_response(
+            json.dumps("Token's user ID doesn't match given user ID."), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    # Verify that the access token is valid for this app.
+    if result['issued_to'] != CLIENT_ID:
+        response = make_response(
+            json.dumps("Token's client ID does not match app's."), 401)
+        print "Token's client ID does not match app's."
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    stored_credentials = login_session.get('credentials')
+    stored_gplus_id = login_session.get('gplus_id')
+    if stored_credentials is not None and gplus_id == stored_gplus_id:
+        response = make_response(json.dumps('Current user is already connected.'),
+                                 200)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    # Store the access token in the session for later use.
+    login_session['credentials'] = credentials.access_token
+    login_session['gplus_id'] = gplus_id
+
+    # Get user info
+    userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
+    params = {'access_token': credentials.access_token, 'alt': 'json'}
+    answer = requests.get(userinfo_url, params=params)
+
+    data = answer.json()
+
+    login_session['username'] = data['name']
+    login_session['picture'] = data['picture']
+    login_session['email'] = data['email']
+
+    # See if a user exists, if it doesn't make a new one
+    user_id = getUserID(login_session['email'])
+    if not user_id:
+      createUser(login_session)
+    login_session['user_id'] = user_id
+
+    output = ''
+    output += '<h1>Welcome, '
+    output += login_session['username']
+    output += '!</h1>'
+    output += '<img src="'
+    output += login_session['picture']
+    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    flash("you are now logged in as %s" % login_session['username'])
+    print "done!"
+    return output
+
+@app.route('/gdisconnect')
+def gdisconnect():
+        # Only disconnect a connected user.
+    credentials = login_session.get('credentials')
+    if credentials is None:
+        response = make_response(
+            json.dumps('Current user not connected.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    access_token = credentials.access_token
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[0]
+
+    if result['status'] == '200':
+        # Reset the user's sesson.
+        del login_session['credentials']
+        del login_session['gplus_id']
+        del login_session['username']
+        del login_session['email']
+        del login_session['picture']
+
+        response = make_response(json.dumps('Successfully disconnected.'), 200)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    else:
+        # For whatever reason, the given token was invalid.
+        response = make_response(
+            json.dumps('Failed to revoke token for given user.', 400))
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+def createUser(login_session):
+    newUser = User(name=login_session['username'], email=login_session[
+                   'email'], picture=login_session['picture'])
+    session.add(newUser)
+    session.commit()
+    user = session.query(User).filter_by(email=login_session['email']).one()
+    return user.id
+
+
+def getUserInfo(user_id):
+    user = session.query(User).filter_by(id=user_id).one()
+    return user
+
+
+def getUserID(email):
+    try:
+        user = session.query(User).filter_by(email=email).one()
+        return user.id
+    except:
+        return None
+
+
+# --------------------------------------------------------------------
 # Here are our pages 
 # --------------------------------------------------------------------
 @app.route('/')
@@ -51,11 +226,16 @@ def playerJSON(player_id):
 def showTeams():
 	""" The home page. Shows all teams"""
 	teams = session.query(Team).all()
-	return render_template('home.html', teams=teams)
+	if 'username' not in login_session:
+		return render_template('publichome.html', teams=teams)
+	else:
+		return render_template('home.html', teams=teams)
 
 @app.route('/teams/new/', methods=['GET', 'POST'])
 def newTeam():
 	""" Add a new team """
+	if 'username' not in login_session:
+		return redirect('/login/')
 	if request.method == 'POST':
 		name = request.form['name']
 		owner = request.form['owner']
@@ -70,6 +250,8 @@ def newTeam():
 @app.route('/teams/<int:team_id>/delete/', methods=['GET', 'POST'])
 def deleteTeam(team_id):
 	""" Delete Team and disassociate all its players from the team."""
+	if 'username' not in login_session:
+		return redirect('/login/')
 	team = session.query(Team).filter_by(id = team_id).one()
 	players = session.query(Player).filter_by(team_id = team.id)
 	if request.method == 'POST':
@@ -86,11 +268,17 @@ def deleteTeam(team_id):
 @app.route('/teams/<int:team_id>/roster/')
 def showRoster(team_id):
 	team = session.query(Team).filter_by(id = team_id).one()
+	creator = getUserInfo(team.user_id)
 	players = session.query(Player).filter_by(team_id = team.id)
-	return render_template('team.html', team=team, players=players)
+	if 'username' not in login_session or creator.id != login_session['user_id']:
+		return render_template('publicteam.html', team=team, players=players, creator=creator)
+	else:
+		return render_template('team.html', team=team, players=players, creator=creator)
 
 @app.route('/team/<int:team_id>/roster/new/', methods=['GET', 'POST'])
 def addPlayer(team_id): 
+	if 'username' not in login_session:
+		return redirect('/login/')
 	if request.method == 'POST':
 		name = request.form['name']
 		position = request.form['position']
@@ -111,6 +299,8 @@ def addPlayer(team_id):
 @app.route('/team/<int:team_id>/roster/<int:player_id>/edit/', methods=['GET', 'POST'])
 def editPlayer(team_id, player_id):
 	""" Edit the position or points of a particular player """
+	if 'username' not in login_session:
+		return redirect('/login/')
 	player = session.query(Player).filter_by(id = player_id).one()
 	if request.method == 'POST':
 		position = request.form['position']
@@ -127,6 +317,8 @@ def editPlayer(team_id, player_id):
 @app.route('/team/<int:team_id>/roster/<int:player_id>/delete/', methods=['GET', 'POST'])
 def deletePlayer(team_id, player_id):
 	""" Delete Team and disassociate all its players from the team."""
+	if 'username' not in login_session:
+		return redirect('/login/')
 	player = session.query(Player).filter_by(id = player_id).one()
 	if request.method == 'POST':
 		session.delete(player)
@@ -143,11 +335,16 @@ def showFreeAgents():
 	# for now, we set team id to 1 just to redirect somewhere
 	team_id = 3
 	players = session.query(Player).filter_by(team_id = 'null')
-	return render_template('freeagents.html', players=players, team_id=team_id)
+	if 'username' not in login_session:
+		return render_template('publicfreeagents.html', players=players, team_id=team_id)
+	else:
+		return render_template('freeagents.html', players=players, team_id=team_id)
 
 @app.route('/team/<int:team_id>/addplayer/<int:player_id>/', methods=['GET', 'POST'])
 def addPlayerToTeam(team_id, player_id):
 	""" Add player to current user's team """
+	if 'username' not in login_session:
+		return redirect('/login/')
 	player = session.query(Player).filter_by(id = player_id).one()
 	if request.method == 'POST':
 		player.team_id = team_id
