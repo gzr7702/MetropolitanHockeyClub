@@ -1,21 +1,33 @@
 {% extends "base.html" %}    
 
     {% block content %}   
-	<h2>Edit Info for {{ player.name }}</h2>
 
-	<div class = 'pane'>
-			<form action="{{ url_for('editPlayer', team_id=player.team_id, player_id=player.id) }}" method = 'POST'>
+	<div class = "row spacer">
+		<h2>Edit Info for {{ player.name }}</h2>
+	</div>
 
-			<dl>
-				<dt>Position:</dt><dt>Current Postition: {{ player.position }}</dt>
-					<dd><input type ='text' size='30' name='position'></dd>
-				<dt>Points:</dt><dt>Current Points: {{ player.points }}</dt>
-					<dd><input type ='text' size='30' name='points'></dd>
-			</dl>
+		<form action="{{ url_for('editPlayer', team_id=player.team_id, player_id=player.id) }}" method = 'POST'>
 
+			<div class = "row spacer">
+				<div claas="col-md-6">
+					<h3>Current Postition: {{ player.position }}</h3>
+				</div>
+				<div claas="col-md-6">
+					<input type ='text' size='30' name='position'>
+				</div>
+			</div>
 
-		<input type='submit' value='Create'>
-
+			<div class = "row spacer">
+				<div claas="col-md-6">
+					<h3>Current Points: {{ player.points }}</h3>
+				</div>
+				<div claas="col-md-6">
+					<input type ='text' size='30' name='points'>
+				</div>
+			</div>	
+			<div class = "row spacer">
+				<input type='submit' value='Update'>
+			</div>
 		</form>
 	</div>
 

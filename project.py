@@ -173,6 +173,7 @@ def gdisconnect():
             json.dumps('Current user not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
+    #import pdb; pdb.set_trace()
     access_token = credentials.access_token
     url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
     h = httplib2.Http()
@@ -204,11 +205,9 @@ def createUser(login_session):
     user = session.query(User).filter_by(email=login_session['email']).one()
     return user.id
 
-
 def getUserInfo(user_id):
     user = session.query(User).filter_by(id=user_id).one()
     return user
-
 
 def getUserID(email):
     try:
@@ -229,7 +228,7 @@ def showTeams():
 	if 'username' not in login_session:
 		return render_template('publichome.html', teams=teams)
 	else:
-		return render_template('home.html', teams=teams)
+		return render_template('home.html', teams=teams, username=login_session['username'])
 
 @app.route('/teams/new/', methods=['GET', 'POST'])
 def newTeam():
@@ -238,14 +237,14 @@ def newTeam():
 		return redirect('/login/')
 	if request.method == 'POST':
 		name = request.form['name']
-		owner = request.form['owner']
-		new_team = Team(name, owner)
+		user_id = getUserID(login_session['email'])
+		new_team = Team(name=name, user_id=user_id)
 		session.add(new_team)
 		session.commit()
 		flash("New team created!")
 		return redirect(url_for('showTeams'))
 	else:
-		return render_template('newteam.html')
+		return render_template('newteam.html', username=login_session['username'])
 
 @app.route('/teams/<int:team_id>/delete/', methods=['GET', 'POST'])
 def deleteTeam(team_id):
@@ -283,12 +282,15 @@ def addPlayer(team_id):
 		name = request.form['name']
 		position = request.form['position']
 		points = request.form['points']
+		team = session.query(Team).filter_by(id = team_id).one()
+		user = getUserInfo(team.user_id)
+		creator = getUserID(user.email)
 		#if name already exists, return to form
 		if session.query(Player).filter_by(name = name).count() > 0:
 			# Is a flash enough to alert the user? ==================
 			flash(name + " already exists!")
 			return render_template('newplayer.html', team_id=team_id)
-		new_player = Player(name, position, points, team_id)
+		new_player = Player(name=name, position=position, points=points, team_id=team_id, user_id=creator)
 		session.add(new_player)
 		session.commit()
 		flash("New Player created!")
@@ -334,7 +336,8 @@ def showFreeAgents():
 	# This is broken until we add user IDs. Need to add player to the user's team ===============
 	# for now, we set team id to 1 just to redirect somewhere
 	team_id = 3
-	players = session.query(Player).filter_by(team_id = 'null')
+	players = session.query(Player).filter_by(team_id = None).all()
+	print(players)
 	if 'username' not in login_session:
 		return render_template('publicfreeagents.html', players=players, team_id=team_id)
 	else:

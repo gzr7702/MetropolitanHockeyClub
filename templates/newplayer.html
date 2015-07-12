@@ -2,23 +2,36 @@
 
     {% block content %}   
 
-	<h2>Add a New Player</h2>
+    <div class="row spacer">
+		<h2>Add a New Player</h2>
+	</div>
 
-	<div class = 'pane'>
-			<form action="{{ url_for('addPlayer', team_id=team_id) }}" method = 'POST'>
+		<form action="{{ url_for('addPlayer', team_id=team_id) }}" method = 'POST'>
 
-			<dl>
-				<dt>Name:</dt>
-					<dd><input type ='text' size='30' name='name'></dd>
-				<dt>Position:</dt>
-					<dd><input type ='text' size='30' name='position'></dd>
-				<dt>Points:</dt>
-					<dd><input type ='text' size='30' name='points'></dd>
-			</dl>
+		    <div class="row spacer">
+		    	<div class="col-md-2">Name:</div>
+				<div class="col-md-10"><input type ='text' size='30' name='name'></div>
+			</div>
 
+		    <div class="row spacer">
+		    	<div class="col-md-2">Position:</div>
+				<div class="col-md-10"><input type ='text' size='30' name='position'></div>
+			</div>
 
-		<input type='submit' value='Create'>
-			<a href = "{{ url_for('showFreeAgents') }}">Free Agents</a>
+		    <div class="row spacer">
+		    	<div class="col-md-2">Points:</div>
+				<div class="col-md-10"><input type ='text' size='30' name='points'></div>
+			</div>
+
+		    <div class="row spacer">
+				<div class="col-md-2"><input type='submit' value='Create'></div>
+				<div class="col-md-10"></div>
+			</div>
+		    <div class="row spacer">
+				<div class="col-md-2"></div>
+				<div class="col-md-2"><a href = "{{ url_for('showFreeAgents') }}">View List of Free Agents</a></div>
+				<div class="col-md-8"></div>
+			</div>
 
 		</form>
 	</div>

@@ -21,32 +21,54 @@
 	</div>
 	-->
 
-    <div class="row">
-	    <div class="col-md-12">
-			<a href="{{ url_for('addPlayer', team_id=team.id)}}">Add a new player</a>
-		</div>
-	</div>
-
 	{% if not players %}
+
 	    <div class="row">
 	    	<div class="col-md-12">
 				<p>Sorry, there are no players on this team_id. 
 				Please <a href="{{ url_for('addPlayer', team_id=team.id)}}">add some.</a></p>
 			</div>
 		</div>
+
 	{% else %}
+
 		{% for player in players %}
-	    <div class="row">
-		    <div class="col-md-12">
+	    <div class="row spacer">
+		    <div class="col-md-4">
 				<h3>Name: {{player.name}}</h3>
+			</div>
+		    <div class="col-md-4">
 				<h3>Position: {{player.position}}</h3>
+			</div>
+		    <div class="col-md-4">
 				<h3>Total Points: {{player.points}}</h3>
-				<p><a href="{{ url_for('editPlayer', team_id=team.id, player_id=player.id)}}">edit</a></p>
-				<p><a href="{{ url_for('deletePlayer', team_id=team.id, player_id=player.id)}}">delete</a></p>
-				<br>
 			</div>
 		</div>
+	    <div class="row spacer">
+		    <div class="col-md-1">
+				<form action="{{ url_for('editPlayer', team_id=team.id, player_id=player.id)}}">
+    				<input type="submit" value="Edit">
+				</form>
+			</div>
+		    <div class="col-md-1">
+				<form action="{{ url_for('deletePlayer', team_id=team.id, player_id=player.id)}}">
+    				<input type="submit" value="Delete">
+				</form>
+			</div>
+		    <div class="col-md-10">
+		    </div>
+				<br>
+		</div>
+
+
 		{% endfor %}
+
+		<div class="row spacer">
+			<div class="col-md-12">
+				<a href="{{ url_for('addPlayer', team_id=team.id)}}">Add a new player</a>
+			</div>
+		</div>
+
 	{% endif %}
 
 {% endblock %}

@@ -17,6 +17,9 @@
     <!-- Custom CSS -->
     <link href="{{ url_for('static', filename='css/simple-sidebar.css') }}" rel="stylesheet">
 
+    <!-- My CSS -->
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -28,6 +31,9 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
     <script src="//apis.google.com/js/platform.js?onload=start"></script>
     <!-- END PRE-REQUISITES FOR GOOGLE SIGN IN -->
+
+    <!-- fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Arvo' rel='stylesheet' type='text/css'>
 
 </head>
 
@@ -53,6 +59,9 @@
                     <a href="{{ url_for('showLogin') }}">Login</a>
                 </li>
                 <li>
+                    <a href="{{ url_for('gdisconnect') }}">Logout</a>
+                </li>
+                <li>
                     <a href="/about/">About</a>
                 </li>
             </ul>
@@ -74,7 +83,7 @@
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row spacer">
                     <div class="col-md-12">
                         <a href="#menu-toggle" class="btn btn-default" id="menu-toggle">Toggle Menu</a>
                     </div>
