@@ -53,6 +53,6 @@ class Player(Base):
 	    	}
 
 
-engine = create_engine('sqlite:///hockeyteamswithusers.db')
+engine = create_engine('sqlite:///hockeyteams.db')
 
 Base.metadata.create_all(engine)

@@ -32,17 +32,7 @@
 				<h4>Total Points: {{player.points}}</h4>
 			</div>
 		</div>
-		<div class="row">
-			<div class="col-md-4">
-				<a href="{{ url_for('addPlayerToTeam', team_id=team_id, player_id=player.id)}}">add to my team</a>
-			</div>
-			<div class="col-md-8">
-				<a href="{{ url_for('deletePlayer', team_id=team_id, player_id=player.id)}}">delete</a>
-			</div>
-			<div class="row">
-				<hr>
-			</div>
-		</div>
+
 		{% endfor %}
 	{% endif %}
 	</div>

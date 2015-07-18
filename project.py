@@ -252,8 +252,9 @@ def deleteTeam(team_id):
 	if 'username' not in login_session:
 		return redirect('/login/')
 	team = session.query(Team).filter_by(id = team_id).one()
+	creator = getUserInfo(team.user_id)
 	players = session.query(Player).filter_by(team_id = team.id)
-	if request.method == 'POST':
+	if request.method == 'POST' and creator == user_id:
 		for player in players:
 			player.team = None
 		session.delete(team)
@@ -268,7 +269,10 @@ def deleteTeam(team_id):
 def showRoster(team_id):
 	team = session.query(Team).filter_by(id = team_id).one()
 	creator = getUserInfo(team.user_id)
-	players = session.query(Player).filter_by(team_id = team.id)
+	if session.query(Player).filter_by(team_id = team.id).count() > 0:
+		players = session.query(Player).filter_by(team_id = team.id).all()
+	else:
+		players = None
 	if 'username' not in login_session or creator.id != login_session['user_id']:
 		return render_template('publicteam.html', team=team, players=players, creator=creator)
 	else:
@@ -335,11 +339,12 @@ def showFreeAgents():
 	""" Show a list of Players and allow them to be added to a team. """
 	# This is broken until we add user IDs. Need to add player to the user's team ===============
 	# for now, we set team id to 1 just to redirect somewhere
-	team_id = 3
-	players = session.query(Player).filter_by(team_id = None).all()
+	#user_id = getUserID(login_session['email'])
+	#team_id = getUserID(login_session['email'])
+	players = session.query(Player).filter_by(team_id = 'null').all()
 	print(players)
 	if 'username' not in login_session:
-		return render_template('publicfreeagents.html', players=players, team_id=team_id)
+		return render_template('publicfreeagents.html', players=players)
 	else:
 		return render_template('freeagents.html', players=players, team_id=team_id)
 
