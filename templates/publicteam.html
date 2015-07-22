@@ -22,14 +22,14 @@
 	-->
 
 	{% if not players %}
-	    <div class="row">
+	    <div class="row spacer">
 	    	<div class="col-md-12">
-				<p>Sorry, there are no players on this team_id. 
+				<h3>Sorry, there are no players on this team.</h3>
 			</div>
 		</div>
 	{% else %}
 		{% for player in players %}
-	    <div class="row">
+	    <div class="row spacer">
 		    <div class="col-md-12">
 				<h3>Name: {{player.name}}</h3>
 				<h3>Position: {{player.position}}</h3>

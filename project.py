@@ -252,8 +252,10 @@ def deleteTeam(team_id):
 	if 'username' not in login_session:
 		return redirect('/login/')
 	team = session.query(Team).filter_by(id = team_id).one()
-	creator = getUserInfo(team.user_id)
 	players = session.query(Player).filter_by(team_id = team.id)
+	creator = team.user_id
+	user_id = getUserID(login_session['email'])
+	#import pdb; pdb.set_trace()
 	if request.method == 'POST' and creator == user_id:
 		for player in players:
 			player.team = None
@@ -262,18 +264,21 @@ def deleteTeam(team_id):
 		flash("Team deleted!")
 		return redirect(url_for('showTeams'))
 	else:
+		flash("There was a problem deleting the team!")
 		return render_template('deleteteam.html', team=team, team_id=team_id)
 
 @app.route('/teams/<int:team_id>/')
 @app.route('/teams/<int:team_id>/roster/')
 def showRoster(team_id):
 	team = session.query(Team).filter_by(id = team_id).one()
-	creator = getUserInfo(team.user_id)
+	creator = team.user_id
+	user_id = getUserID(login_session['email'])
 	if session.query(Player).filter_by(team_id = team.id).count() > 0:
 		players = session.query(Player).filter_by(team_id = team.id).all()
 	else:
 		players = None
-	if 'username' not in login_session or creator.id != login_session['user_id']:
+	#import pdb; pdb.set_trace()
+	if 'username' not in login_session or creator != user_id:
 		return render_template('publicteam.html', team=team, players=players, creator=creator)
 	else:
 		return render_template('team.html', team=team, players=players, creator=creator)
@@ -342,7 +347,6 @@ def showFreeAgents():
 	#user_id = getUserID(login_session['email'])
 	#team_id = getUserID(login_session['email'])
 	players = session.query(Player).filter_by(team_id = 'null').all()
-	print(players)
 	if 'username' not in login_session:
 		return render_template('publicfreeagents.html', players=players)
 	else:
