@@ -33,11 +33,14 @@
 			</div>
 		</div>
 		<div class="row spacer">
+			<form action="{{ url_for('addPlayerToTeam', team_id=team_id, player_id=player.id)}}">
 			<div class="col-md-4">
-				<a href="{{ url_for('addPlayerToTeam', team_id=team_id, player_id=player.id)}}">add to my team</a>
+				<input type=submit value="Add to my team">
 			</div>
+			</form>
+			<form action="{{ url_for('deletePlayer', team_id=team_id, player_id=player.id)}}">
 			<div class="col-md-8">
-				<a href="{{ url_for('deletePlayer', team_id=team_id, player_id=player.id)}}">delete</a>
+				<input type=submit value="Delete">
 			</div>
 			<div class="row">
 				<hr>

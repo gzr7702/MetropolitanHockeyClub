@@ -342,11 +342,11 @@ def deletePlayer(team_id, player_id):
 @app.route('/teams/freeagents/')
 def showFreeAgents():
 	""" Show a list of Players and allow them to be added to a team. """
-	# This is broken until we add user IDs. Need to add player to the user's team ===============
-	# for now, we set team id to 1 just to redirect somewhere
-	#user_id = getUserID(login_session['email'])
-	#team_id = getUserID(login_session['email'])
+	user_id = getUserID(login_session['email'])
+	team = session.query(Team).filter_by(user_id = user_id).one()
+	team_id = team.id
 	players = session.query(Player).filter_by(team_id = 'null').all()
+	#import pdb; pdb.set_trace()
 	if 'username' not in login_session:
 		return render_template('publicfreeagents.html', players=players)
 	else:

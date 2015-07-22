@@ -20,6 +20,8 @@ Todo:
 
 - Make sure all functionality works:
 	- free agents doesn't work
+	- delete on free agents needs to pass in no team id (passes '1' now)
+	
 	- when you try to delete a team that's not yours, nothing happens
 	- fix flash functionality
 
