@@ -18,13 +18,7 @@ This will run the application with the dev server on port 5000
 
 Todo:
 
-- Make sure all functionality works:
-	- free agents doesn't work
-	- delete on free agents needs to pass in no team id (passes '1' now)
-	
-	- when you try to delete a team that's not yours, nothing happens
-	- fix flash functionality
-
+- fix flash functionality
 - Fix gdisconnect
-- Take out Delete team from home screen and add a separate page? Add admin page and user?
+- Add free agents?
 - Double check all documentation

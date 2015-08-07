@@ -42,7 +42,7 @@ def teamsJSON():
 @app.route('/teams/freeagents/JSON/')
 def freeAgentsJSON():
 	""" Return JSON of Players that are not associated with a team. """
-	players = session.query(Player).filter_by(team_id = 'null')
+	players = session.query(Player).filter_by(team_id = None)
 	return jsonify(Players=[p.serialize for p in players])
 
 @app.route('/teams/<int:team_id>/JSON/')
@@ -340,12 +340,11 @@ def deletePlayer(team_id, player_id):
 		return render_template('deleteplayer.html', player=player, team_id=team_id)
 
 @app.route('/teams/freeagents/')
-def showFreeAgents():
+@app.route('/teams/<int:team_id>/freeagents/')
+def showFreeAgents(team_id=None):
 	""" Show a list of Players and allow them to be added to a team. """
-	user_id = getUserID(login_session['email'])
-	team = session.query(Team).filter_by(user_id = user_id).one()
-	team_id = team.id
-	players = session.query(Player).filter_by(team_id = 'null').all()
+	team_id = team_id
+	players = session.query(Player).filter_by(team_id = None).all()
 	#import pdb; pdb.set_trace()
 	if 'username' not in login_session:
 		return render_template('publicfreeagents.html', players=players)
