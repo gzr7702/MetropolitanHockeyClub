@@ -25,10 +25,14 @@
 				<p>Sorry, there are no players on this team. 
 				Please add some.</p>
 		</div>
-		<div class = "row spacer">
-			<form action="{{ url_for('addPlayer', team_id=team.id) }}">
-				<input type='submit' value='Add Player'>
-			</form>
+		<div class="row spacer">
+			<div class="col-md-2">
+				<a href="{{ url_for('addPlayer', team_id=team.id)}}">Add a new player</a>
+			</div>
+
+			<div class="col-md-10">
+				<a href="{{ url_for('deleteTeam', team_id=team.id)}}">Delete this team</a>
+			</div>
 		</div>
 
 	{% else %}

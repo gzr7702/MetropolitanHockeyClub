@@ -18,7 +18,6 @@ This will run the application with the dev server on port 5000
 
 Todo:
 
-- fix flash functionality
 - Fix gdisconnect
-- Add free agents?
-- Double check all documentation
+- Add page to add free agents - maybe add link on main page that let's you add free agent only. 
+- Double check all documentation, general cleanup, hand it in!

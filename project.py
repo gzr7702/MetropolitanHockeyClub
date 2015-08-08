@@ -241,7 +241,7 @@ def newTeam():
 		new_team = Team(name=name, user_id=user_id)
 		session.add(new_team)
 		session.commit()
-		flash("New team created!")
+		flash("New team " + new_time.name + " created!")
 		return redirect(url_for('showTeams'))
 	else:
 		return render_template('newteam.html', username=login_session['username'])
@@ -261,10 +261,9 @@ def deleteTeam(team_id):
 			player.team = None
 		session.delete(team)
 		session.commit()
-		flash("Team deleted!")
+		flash(team.name + " deleted!")
 		return redirect(url_for('showTeams'))
 	else:
-		flash("There was a problem deleting the team!")
 		return render_template('deleteteam.html', team=team, team_id=team_id)
 
 @app.route('/teams/<int:team_id>/')
@@ -277,7 +276,6 @@ def showRoster(team_id):
 		players = session.query(Player).filter_by(team_id = team.id).all()
 	else:
 		players = None
-	#import pdb; pdb.set_trace()
 	if 'username' not in login_session or creator != user_id:
 		return render_template('publicteam.html', team=team, players=players, creator=creator)
 	else:
@@ -296,8 +294,8 @@ def addPlayer(team_id):
 		creator = getUserID(user.email)
 		#if name already exists, return to form
 		if session.query(Player).filter_by(name = name).count() > 0:
-			# Is a flash enough to alert the user? ==================
-			flash(name + " already exists!")
+			message = "Player " + name + " already exists! Please add a different player."
+			flash(message)
 			return render_template('newplayer.html', team_id=team_id)
 		new_player = Player(name=name, position=position, points=points, team_id=team_id, user_id=creator)
 		session.add(new_player)
