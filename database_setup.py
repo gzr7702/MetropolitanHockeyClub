@@ -1,3 +1,6 @@
+""" These are our User, Team and Player classes for the database.
+"""
+
 import sys
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
