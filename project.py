@@ -71,13 +71,12 @@ def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
     login_session['state'] = state
-    # return "The current session state is %s" % login_session['state']
     return render_template('login.html', STATE=state)
 
 
 @app.route('/gconnect', methods=['POST'])
+@app.route('/gconnect', methods=['POST'])
 def gconnect():
-
     # Validate state token
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
@@ -133,7 +132,7 @@ def gconnect():
         return response
 
     # Store the access token in the session for later use.
-    login_session['credentials'] = credentials.access_token
+    login_session['credentials'] = credentials
     login_session['gplus_id'] = gplus_id
 
     # Get user info
@@ -148,10 +147,6 @@ def gconnect():
     login_session['email'] = data['email']
 
     # See if a user exists, if it doesn't make a new one
-    user_id = getUserID(login_session['email'])
-    if not user_id:
-      createUser(login_session)
-    login_session['user_id'] = user_id
 
     output = ''
     output += '<h1>Welcome, '
@@ -166,14 +161,13 @@ def gconnect():
 
 @app.route('/gdisconnect')
 def gdisconnect():
-        # Only disconnect a connected user.
+    # Only disconnect a connected user.
     credentials = login_session.get('credentials')
     if credentials is None:
         response = make_response(
             json.dumps('Current user not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
-    #import pdb; pdb.set_trace()
     access_token = credentials.access_token
     url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
     h = httplib2.Http()
@@ -187,15 +181,14 @@ def gdisconnect():
         del login_session['email']
         del login_session['picture']
 
-        response = make_response(json.dumps('Successfully disconnected.'), 200)
-        response.headers['Content-Type'] = 'application/json'
-        return response
+        return redirect('/')
     else:
         # For whatever reason, the given token was invalid.
         response = make_response(
             json.dumps('Failed to revoke token for given user.', 400))
         response.headers['Content-Type'] = 'application/json'
         return response
+
 
 def createUser(login_session):
     newUser = User(name=login_session['username'], email=login_session[
@@ -271,12 +264,12 @@ def deleteTeam(team_id):
 def showRoster(team_id):
 	team = session.query(Team).filter_by(id = team_id).one()
 	creator = team.user_id
-	user_id = getUserID(login_session['email'])
 	if session.query(Player).filter_by(team_id = team.id).count() > 0:
 		players = session.query(Player).filter_by(team_id = team.id).all()
 	else:
 		players = None
-	if 'username' not in login_session or creator != user_id:
+
+	if 'username' not in login_session or creator != getUserID(login_session['email']):
 		return render_template('publicteam.html', team=team, players=players, creator=creator)
 	else:
 		return render_template('team.html', team=team, players=players, creator=creator)

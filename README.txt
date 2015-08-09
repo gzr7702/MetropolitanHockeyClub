@@ -18,6 +18,6 @@ This will run the application with the dev server on port 5000
 
 Todo:
 
-- Fix gdisconnect
 - Add page to add free agents - maybe add link on main page that let's you add free agent only. 
+- Add actual pages for all paths of gconnect
 - Double check all documentation, general cleanup, hand it in!
