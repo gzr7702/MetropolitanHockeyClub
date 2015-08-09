@@ -234,7 +234,7 @@ def newTeam():
 		new_team = Team(name=name, user_id=user_id)
 		session.add(new_team)
 		session.commit()
-		flash("New team " + new_time.name + " created!")
+		flash("New team " + new_team.name + " created!")
 		return redirect(url_for('showTeams'))
 	else:
 		return render_template('newteam.html', username=login_session['username'])
@@ -298,6 +298,30 @@ def addPlayer(team_id):
 	else:
 		return render_template('newplayer.html', team_id=team_id)
 
+@app.route('/addfreeagent/', methods=['GET', 'POST'])
+def addFreeAgent(): 
+	if 'username' not in login_session:
+		return redirect('/login/')
+	if request.method == 'POST':
+		name = request.form['name']
+		position = request.form['position']
+		points = request.form['points']
+		user_email = login_session['email']
+		creator = getUserID(user_email)
+		#if name already exists, return to form
+		if session.query(Player).filter_by(name = name).count() > 0:
+			message = "Player " + name + " already exists! Please add a different player."
+			flash(message)
+			return render_template('newfreeagent.html')
+		new_player = Player(name=name, position=position, points=points, team_id=None, user_id=creator)
+		session.add(new_player)
+		session.commit()
+		flash("New free agent " + name + " created!")
+		return redirect('/')
+	else:
+		return render_template('newfreeagent.html')
+
+
 @app.route('/team/<int:team_id>/roster/<int:player_id>/edit/', methods=['GET', 'POST'])
 def editPlayer(team_id, player_id):
 	""" Edit the position or points of a particular player """
@@ -336,7 +360,6 @@ def showFreeAgents(team_id=None):
 	""" Show a list of Players and allow them to be added to a team. """
 	team_id = team_id
 	players = session.query(Player).filter_by(team_id = None).all()
-	#import pdb; pdb.set_trace()
 	if 'username' not in login_session:
 		return render_template('publicfreeagents.html', players=players)
 	else:

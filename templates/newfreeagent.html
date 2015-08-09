@@ -1,0 +1,51 @@
+{% extends "base.html" %}    
+
+    {% block content %}   
+
+    <div class="row spacer">
+		<h2>Add a New Free Agent</h2>
+	</div>
+
+	<div class = 'flash'>
+		{% with messages = get_flashed_messages() %}
+			{% if messages %}
+				<ul>
+				{% for message in messages %}
+					<li><strong>{{ message }}</strong></li>
+				{% endfor %}
+				</ul>
+			{% endif %}
+		{% endwith %}
+	</div>
+
+		<form action="{{ url_for('addFreeAgent') }}" method = 'POST'>
+
+		    <div class="row spacer">
+		    	<div class="col-md-2">Name:</div>
+				<div class="col-md-10"><input type ='text' size='30' name='name'></div>
+			</div>
+
+		    <div class="row spacer">
+		    	<div class="col-md-2">Position:</div>
+				<div class="col-md-10"><input type ='text' size='30' name='position'></div>
+			</div>
+
+		    <div class="row spacer">
+		    	<div class="col-md-2">Points:</div>
+				<div class="col-md-10"><input type ='text' size='30' name='points'></div>
+			</div>
+
+		    <div class="row spacer">
+				<div class="col-md-2"><input type='submit' value='Create'></div>
+				<div class="col-md-10"></div>
+			</div>
+		    <div class="row spacer">
+				<div class="col-md-2"></div>
+				<div class="col-md-2"><a href = "{{ url_for('showFreeAgents') }}">View List of Free Agents</a></div>
+				<div class="col-md-8"></div>
+			</div>
+
+		</form>
+	</div>
+
+{% endblock %}
