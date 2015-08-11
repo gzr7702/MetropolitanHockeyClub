@@ -150,6 +150,10 @@ def gconnect():
     login_session['email'] = data['email']
 
     # See if a user exists, if it doesn't make a new one
+    user_id = getUserID(login_session['email'])
+    if not user_id:
+    	user_id = createUser(login_session)
+    login_session['user_id'] = user_id
 
     output = ''
     output += '<h1>Welcome, '
@@ -238,6 +242,7 @@ def newTeam():
 	if request.method == 'POST':
 		name = request.form['name']
 		user_id = getUserID(login_session['email'])
+		print(user_id)
 		new_team = Team(name=name, user_id=user_id)
 		session.add(new_team)
 		session.commit()
