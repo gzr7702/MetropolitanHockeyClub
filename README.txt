@@ -5,11 +5,13 @@ read, update, and delete teams and players.
 
 ## Section 2: Prerequisites
 - Python 2.7
-- Flask
-- Sqlalchemy
-- oauth2client
-- httplib
-- requests
+- Flask 0.9
+- Jinja2 2.7.2
+- Werkzeug 0.8.3
+- Sqlalchemy 0.8.4
+- oauth2client 1.4.11
+- httplib2 0.9.1
+- requests 2.2.1
 
 ## Section 3: Instalation
 To download the app, run:
@@ -37,9 +39,3 @@ The application will only give you read access to all teams and players unless y
 your Google account. Once you are logged in, you can create, update and delete teams, add players to your teams,
 update player info, and add free agents (players who are not asscociated with a team).
 Players on your team can be accessed via your team's page.
-
-
-todo:
-
-- Check data loaded to database
-- check versions of dependencies
