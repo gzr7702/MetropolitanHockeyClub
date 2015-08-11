@@ -5,7 +5,7 @@ import csv
 
 def main():
 	# Connect to the database
-	conn = sqlite3.connect('hockeyteams.db')
+	conn = sqlite3.connect('../hockeyteams.db')
 	cursor = conn.cursor()
 
 	# Read in user data and write to the database

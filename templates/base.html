@@ -55,12 +55,16 @@
                 <li>
                     <a href="{{ url_for('addFreeAgent') }}">Add a Free Agent</a>
                 </li>
-                <li>
-                    <a href="{{ url_for('showLogin') }}">Login</a>
-                </li>
-                <li>
-                    <a href="{{ url_for('gdisconnect') }}">Logout</a>
-                </li>
+                <div class="login-container">
+                    <li>
+                        <a href="{{ url_for('showLogin') }}">Login</a>
+                    </li>
+                </div>
+                <div class="logout-container">
+                    <li>
+                        <a href="{{ url_for('gdisconnect') }}">Logout</a>
+                    </li>
+                </div>
                 <li>
                     <a href="/about/">About</a>
                 </li>
@@ -109,6 +113,17 @@
         $("#wrapper").toggleClass("toggled");
     });
     </script>
+
+    <!-- Login Toggle Script -->
+    <script type="text/javascript">
+    jQuery(document).ready(function() {
+        if ( "{{ session["username"] }}") {
+            jQuery(".login-container").hide();
+        } else {
+            jQuery(".logout-container").hide();
+        }
+    });
+ </script>
 
 </body>
 
