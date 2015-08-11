@@ -48,7 +48,7 @@ def freeAgentsJSON():
 @app.route('/teams/<int:team_id>/JSON/')
 @app.route('/teams/<int:team_id>/roster/JSON/')
 def teamRosterJSON(team_id):
-	""" Return JSON of of a specific team. """
+	""" Return JSON of all players in a teams"""
 	try:
 		session.query(Player).filter_by(team_id = team_id).count()
 	except:
@@ -59,6 +59,7 @@ def teamRosterJSON(team_id):
 
 @app.route('/player/<int:player_id>/JSON/')
 def playerJSON(player_id):
+	""" Return JSON of a player's info. """
 	player = session.query(Player).filter_by(id = player_id).one()
 	return jsonify(player.serialize)
 
@@ -69,7 +70,7 @@ def playerJSON(player_id):
 # Create anti-forgery state token
 @app.route('/login/')
 def showLogin():
-	"""The login page used to access a user's google account."""
+    """ Shows the login page. """
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
     login_session['state'] = state
@@ -78,7 +79,7 @@ def showLogin():
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
-	""" Allows the user to login to the site using a Google account with oauth2."""
+    """ Connect to Google using oauth2. """
     # Validate state token
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
@@ -163,7 +164,7 @@ def gconnect():
 
 @app.route('/gdisconnect')
 def gdisconnect():
-	""" Allows a user to disconnect from the Google account. """
+    """ Disconnect from the login session. """
     # Only disconnect a connected user.
     credentials = login_session.get('credentials')
     if credentials is None:
@@ -194,7 +195,7 @@ def gdisconnect():
 
 
 def createUser(login_session):
-	""" Creates a new user on the login_session. """
+    """ Creates a user in the login session. """
     newUser = User(name=login_session['username'], email=login_session[
                    'email'], picture=login_session['picture'])
     session.add(newUser)
@@ -203,12 +204,12 @@ def createUser(login_session):
     return user.id
 
 def getUserInfo(user_id):
-	""" Helper function to get user info. """
+    """ Get all info of a user. """
     user = session.query(User).filter_by(id=user_id).one()
     return user
 
 def getUserID(email):
-	""" Helper function to get a user id. """
+    """ Get the user ID of a user. """
     try:
         user = session.query(User).filter_by(email=email).one()
         return user.id
@@ -231,7 +232,7 @@ def showTeams():
 
 @app.route('/teams/new/', methods=['GET', 'POST'])
 def newTeam():
-	""" Add a new team. It will belong to the user who is logged in. """
+	""" Add a new team """
 	if 'username' not in login_session:
 		return redirect('/login/')
 	if request.method == 'POST':
@@ -268,7 +269,7 @@ def deleteTeam(team_id):
 @app.route('/teams/<int:team_id>/')
 @app.route('/teams/<int:team_id>/roster/')
 def showRoster(team_id):
-	""" Shows the roster of a specific team. """
+	""" Show the roster of a team. """
 	team = session.query(Team).filter_by(id = team_id).one()
 	creator = team.user_id
 	if session.query(Player).filter_by(team_id = team.id).count() > 0:
@@ -283,7 +284,7 @@ def showRoster(team_id):
 
 @app.route('/team/<int:team_id>/roster/new/', methods=['GET', 'POST'])
 def addPlayer(team_id): 
-	""" Add a player to the team of the logged in user. """
+	""" Add a player to a team. """
 	if 'username' not in login_session:
 		return redirect('/login/')
 	if request.method == 'POST':
@@ -308,8 +309,7 @@ def addPlayer(team_id):
 
 @app.route('/addfreeagent/', methods=['GET', 'POST'])
 def addFreeAgent(): 
-	""" Add's a new player as a free agent. The player will not be associated with
-		a specific team. """
+	""" Add a player that is not associated with a team. """
 	if 'username' not in login_session:
 		return redirect('/login/')
 	if request.method == 'POST':
@@ -352,7 +352,7 @@ def editPlayer(team_id, player_id):
 
 @app.route('/team/<int:team_id>/roster/<int:player_id>/delete/', methods=['GET', 'POST'])
 def deletePlayer(team_id, player_id):
-	""" Delete a specific player. """
+	""" Delete Team and disassociate all its players from the team."""
 	if 'username' not in login_session:
 		return redirect('/login/')
 	player = session.query(Player).filter_by(id = player_id).one()
