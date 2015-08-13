@@ -42,7 +42,7 @@ def teamsJSON():
 @app.route('/teams/freeagents/JSON/')
 def freeAgentsJSON():
 	""" Return JSON of Players that are not associated with a team. """
-	players = session.query(Player).filter_by(team_id = None)
+	players = session.query(Player).filter_by(team_id = 0)
 	return jsonify(Players=[p.serialize for p in players])
 
 @app.route('/teams/<int:team_id>/JSON/')
@@ -263,7 +263,7 @@ def deleteTeam(team_id):
 	#import pdb; pdb.set_trace()
 	if request.method == 'POST' and creator == user_id:
 		for player in players:
-			player.team = None
+			player.team_id = 0
 		session.delete(team)
 		session.commit()
 		flash(team.name + " deleted!")
@@ -328,7 +328,7 @@ def addFreeAgent():
 			message = "Player " + name + " already exists! Please add a different player."
 			flash(message)
 			return render_template('newfreeagent.html')
-		new_player = Player(name=name, position=position, points=points, team_id=None, user_id=creator)
+		new_player = Player(name=name, position=position, points=points, team_id=0, user_id=creator)
 		session.add(new_player)
 		session.commit()
 		flash("New free agent " + name + " created!")
@@ -374,7 +374,7 @@ def deletePlayer(team_id, player_id):
 def showFreeAgents(team_id=None):
 	""" Show a list of Players and allow them to be added to a team. """
 	team_id = team_id
-	players = session.query(Player).filter_by(team_id = None).all()
+	players = session.query(Player).filter_by(team_id = 0).all()
 	if 'username' not in login_session:
 		return render_template('publicfreeagents.html', players=players)
 	else:
